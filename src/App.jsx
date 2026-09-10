@@ -157,7 +157,7 @@ function downloadCSV(rows) {
   URL.revokeObjectURL(url);
 }
 
-export default function App() {
+function SellerSignalTool() {
   const [stage, setStage] = useState('upload');
   const [fileName, setFileName] = useState('');
   const [headers, setHeaders] = useState([]);
@@ -697,4 +697,110 @@ export default function App() {
       </div>
     </div>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Access gate — shows a simple shared password screen before the tool loads.
+// Change ACCESS_PASSWORD to whatever code you want to give people who buy it.
+// This resets each time the page is fully reloaded (it does not remember
+// the visitor between visits), so it functions as a soft "always ask" gate.
+// ---------------------------------------------------------------------------
+const ACCESS_PASSWORD = 'upsizedownsize';
+
+function PasswordGate() {
+  const [input, setInput] = useState('');
+  const [unlocked, setUnlocked] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (input.trim().toLowerCase() === ACCESS_PASSWORD.toLowerCase()) {
+      setError('');
+      setUnlocked(true);
+    } else {
+      setError("That code doesn't match. Double-check and try again.");
+    }
+  };
+
+  if (unlocked) return <SellerSignalTool />;
+
+  return (
+    <div className="fss-gate-root">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+        .fss-gate-root {
+          font-family: 'IBM Plex Sans', sans-serif;
+          background: #FAF7F1;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+          box-sizing: border-box;
+        }
+        .fss-gate-root * { box-sizing: border-box; }
+        .fss-gate-card {
+          background: #fff;
+          border: 1px solid #DED6C4;
+          border-radius: 4px;
+          padding: 40px 36px;
+          max-width: 380px;
+          width: 100%;
+          text-align: center;
+        }
+        .fss-gate-eyebrow { font-size: 13px; color: #96742E; font-weight: 600; margin: 0 0 8px; }
+        .fss-gate-title { font-family: 'Lora', serif; font-size: 24px; font-weight: 600; color: #223345; margin: 0 0 10px; }
+        .fss-gate-sub { font-size: 13.5px; color: #5B6469; margin: 0 0 22px; line-height: 1.5; }
+        .fss-gate-input {
+          width: 100%;
+          font-size: 15px;
+          padding: 11px 14px;
+          border: 1px solid #DED6C4;
+          border-radius: 3px;
+          margin-bottom: 14px;
+          text-align: center;
+        }
+        .fss-gate-error {
+          background: #F3E3DF;
+          color: #A8412F;
+          font-size: 13px;
+          padding: 9px 12px;
+          border-radius: 4px;
+          margin-bottom: 14px;
+        }
+        .fss-gate-btn {
+          width: 100%;
+          font-family: 'IBM Plex Sans', sans-serif;
+          font-size: 14px;
+          font-weight: 600;
+          padding: 12px;
+          border-radius: 3px;
+          border: none;
+          background: #223345;
+          color: #fff;
+          cursor: pointer;
+        }
+        .fss-gate-btn:hover { opacity: 0.88; }
+      `}</style>
+      <form className="fss-gate-card" onSubmit={handleSubmit}>
+        <p className="fss-gate-eyebrow">Seller signal</p>
+        <h1 className="fss-gate-title">Enter your access code</h1>
+        <p className="fss-gate-sub">You should have received this when you purchased the tool.</p>
+        <input
+          className="fss-gate-input"
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Access code"
+          autoFocus
+        />
+        {error && <div className="fss-gate-error">{error}</div>}
+        <button className="fss-gate-btn" type="submit">Unlock tool</button>
+      </form>
+    </div>
+  );
+}
+
+export default function App() {
+  return <PasswordGate />;
 }
